@@ -1,6 +1,4 @@
-const MqttHelper = require('./modules/mqttHelper'); // Adjust the path as needed
 const express = require('express');
-const config = require('./modules/constants.js');
 const { default: mqtt } = require('mqtt');
 const userRoutes = require('./routes/userRoutes.js');
 const deviceRoutes = require('./routes/deviceRoutes.js');
@@ -8,10 +6,10 @@ const app = express();
 const port = 3000;
 const errorHandler = require('./errors/errorHandler');
 const db = require('./config/database.js')
+const mqttService = require('./controllers/mqtt.js')
 
 
 
-const mqttBrokerUrl = 'mqtt://broker.emqx.io:1883';
 // 'mqtt://127.0.0.1:1883'; // Example: public MQTT broker
 const server_topic = 'action_server'; // Example: public MQTT broker
 const report_topic = 'report_state'; // Example: public MQTT broker
@@ -20,8 +18,7 @@ const report_topic = 'report_state'; // Example: public MQTT broker
 
 // Middleware برای پردازش JSON
 app.use(express.json());
-const mqttClient = new MqttHelper(mqttBrokerUrl).connect();
-
+mqttService.startMqtt();
 
 // مسیرها
 app.use('/api', userRoutes);
