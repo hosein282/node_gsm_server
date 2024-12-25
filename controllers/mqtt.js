@@ -5,8 +5,8 @@ const config = require('../modules/constants.js');
 const mqttBrokerUrl = 'mqtt://broker.emqx.io:1883';
 
 
+const mqttClient = new MqttHelper(mqttBrokerUrl);
 async function startMqtt() {
-    const mqttClient = new MqttHelper(mqttBrokerUrl);
 
     try {
         await mqttClient.connect();

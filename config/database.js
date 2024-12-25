@@ -19,10 +19,11 @@ const mysql = require('mysql2');
 // MySQL database connection
 const pool = mysql.createConnection(
   {
-       host: process.env.DB_HOST,
-       user: process.env.DB_USER,
-       password: process.env.DB_PASSWORD,
-       database: process.env.DB_NAME
+    host: 'sql12.freemysqlhosting.net',
+    database: 'sql12754135',
+    user: 'sql12754135',
+    password: 'XA6E2T3cSK',
+    port : 3306
        
     }
 );
