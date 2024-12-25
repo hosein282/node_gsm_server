@@ -5,17 +5,18 @@ const clientId = `mqtt_${Math.random().toString(16).slice(3)}`; // Uniquely iden
 
 class MqttHelper {
 
-    
+
 
     connect() {
         return new Promise((resolve, reject) => {
             this.client = mqtt.connect('mqtt://broker.emqx.io:1883', {
                 clientId
-              });
+            });
 
             this.client.on('connect', () => {
 
                 console.log('Connected to MQTT broker');
+
                 resolve();
             });
 
@@ -24,6 +25,7 @@ class MqttHelper {
                 reject(error);
             });
         });
+
     }
 
     subscribe(topic, options = {}) {
@@ -66,6 +68,10 @@ class MqttHelper {
             });
         });
     }
+
+
+ 
+
 
 }
 
