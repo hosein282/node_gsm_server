@@ -2,7 +2,7 @@
 const pool = require('../config/database');
 
 const db = {
-    query: async (sql, params = []) => {
+    query: async (sql, params) => {
         try {
             const result = await new Promise((resolve, reject) => {
                 pool.execute(sql, params, (err, results) => {
@@ -45,15 +45,16 @@ const db = {
     },
 
     update: async (table, data, conditions) => {
-        const setClause = Object.keys(data)
-            .map((key) => `${key} = ?`)
+        const setClause = Object.entries(data)
+            .map(([k,v]) => `${k} = ${v}`)
             .join(', ');
-        const whereClause = Object.keys(conditions)
-            .map((key) => `${key} = ?`)
+        const whereClause = Object.entries(conditions)
+            .map(([k,v]) => `${k} = '${v}'`)
             .join(' AND ');
 
         const sql = `UPDATE ${table} SET ${setClause} WHERE ${whereClause}`;
         const values = [...Object.values(data), ...Object.values(conditions)];
+        console.log(sql);
         return await db.query(sql, values);
     },
 

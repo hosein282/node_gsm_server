@@ -5,19 +5,22 @@ const createDevice = async (req, res) => {
     const { user_id, mac, label, model, password } = req.body; // Destructure the body
     console.log(req.body);
     let outputs, inputs = "";
-    if (model.toLowerCase() == 'g88-t') {
-        outputs = '0,0,0,0,0,0,0,0';
-        inputs = '0,0,0,0,0,0,0,0';
+    if (model.toLowerCase() == 'g84-t') {
+        outputs = '00000000';
+        inputs = '0000';
     } else if (model.toLowerCase() == 'g44-t') {
-        outputs = '0,0,0,0';
-        inputs = '0,0,0,0';
+        outputs = '0000';
+        inputs = '0000';
+    }else{
+        return res.status(400).json({ 'error': "مدل دستگاه اشتباه است" });
+
     }
     if (!user_id || !mac) {
         return res.status(400).json({ 'error': 'اطلاعات ارسالی ناقص است' });
     }
     try {
 
-        const parameters = {};
+        const parameters = {'outStates' :outputs,'inStates' : inputs};
 
         if (user_id !== null) {
             parameters.user_id = user_id;
