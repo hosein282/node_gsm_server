@@ -97,10 +97,10 @@ function handleMqttReport(message) {
 }
 function handleMqttMessage(message) {
 
-    const { mac, out, state, event, timer, label } = message; // Destructure the body
+    const { mac, out, state, event, timer, label,url } = message; // Destructure the body
     if (mac != "" && mac != undefined) {
         const topic = "action" + ">" + mac;
-        const data = { 'out': out, 'state': state, 'event': event, 'timer': timer, 'label': label };
+        const data = { 'out': out, 'state': state, 'event': event, 'timer': timer, 'label': label ,'url': url};
         console.log(data);
 
         mqttClient.publish(topic, JSON.stringify(data));
