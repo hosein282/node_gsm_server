@@ -7,6 +7,7 @@ const port = 3000;
 const errorHandler = require('./errors/errorHandler');
 const db = require('./config/database.js')
 const mqttService = require('./controllers/mqtt.js')
+const auth = require('./middleware/auth.js');
 
 
 
@@ -22,7 +23,7 @@ mqttService.startMqtt();
 
 // مسیرها
 app.use('/api', userRoutes);
-app.use('/api/device', deviceRoutes);
+app.use('/api/device',auth, deviceRoutes);
 
 // مدیریت ارورها
 app.use(errorHandler);

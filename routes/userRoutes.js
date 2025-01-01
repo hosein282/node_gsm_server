@@ -9,5 +9,7 @@ router.post('/signin', userController.getUsers);
 router.put('/:id', userController.updateUser);
 router.delete('/:id', userController.deleteUser);
 router.get('/user',userController.getUserByName);
+router.post('/refresh-token', userController.refreshToken);
+
 
 module.exports = router;
