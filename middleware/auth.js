@@ -1,18 +1,27 @@
 const jwt = require('jsonwebtoken');
 
 const auth = (req, res, next) => {
-    const token = req.header('Authorization').replace('Bearer ', '');
-
-    if (!token) {
-        return res.status(401).json({ error: 'Access denied. No token provided.' });
-    }
 
     try {
-        const decoded = jwt.verify(token, 'your_jwt_secret');
+        console.log(req.header('Authorization'));
+        if(req.header('Authorization') === undefined) {
+            return res.status(401).json({ error: 'Access denied. No token provided.' });
+        }
+        const token = req.header('Authorization').split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ error: 'Access denied. No token provided.' });
+        }
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_TOKEN);
         req.user = decoded;
+        console.log(decoded);
+
         next();
     } catch (err) {
-        res.status(400).json({ error: 'Invalid token.' });
+        console.error(err);
+        if(err.name === 'TokenExpiredError') {
+            return res.status(401).json({ error: 'Access denied. Token expired.' });
+        }
+        res.status(401).json({ error: 'Invalid token.' });
     }
 };
 

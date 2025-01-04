@@ -20,7 +20,7 @@ const createDevice = async (req, res) => {
     }
     try {
 
-        const parameters = {'outStates' :outputs,'inStates' : inputs};
+        const parameters = {'outStates' :outputs,'inStates' : inputs, 'password': "1234"};
 
         if (user_id !== null) {
             parameters.user_id = user_id;
@@ -34,12 +34,10 @@ const createDevice = async (req, res) => {
         if (model !== null) {
             parameters.model = model;
         }
-        if (password !== null) {
-            parameters.password = password;
-        }
+
         console.log(`parameters =>${JSON.stringify(parameters)}`);
 
-        const result = await db.create('devices', parameters);
+        const result = await db.create('devices', JSON.parse(JSON.stringify(parameters)));
         if (result.affectedRows == 1 && result.serverStatus == 2) {
             return res.status(200).json({ 'success': true });
 
@@ -54,6 +52,7 @@ const createDevice = async (req, res) => {
             return res.status(400).json({ 'error': "این دستگاه قبلا ثبت شده است" });
         }
         console.log('carchhh');
+        console.log(`err =>${err}`);
         return res.status(400).json({ 'error': err });
 
     }

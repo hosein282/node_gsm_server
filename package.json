@@ -17,6 +17,7 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "mqtt": "^5.10.3",
-    "mysql2": "^3.11.5"
+    "mysql2": "^3.11.5",
+    "node-cipher": "^6.3.3"
   }
 }
