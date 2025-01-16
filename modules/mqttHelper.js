@@ -43,7 +43,7 @@ class MqttHelper {
 
     publish(topic, message, options = {}) {
         return new Promise((resolve, reject) => {
-            this.client.publish(topic, message, { qos: 0, ...options }, (err) => {
+            this.client.publish(topic, message.toString('utf8'), { qos: 0, ...options }, (err) => {
                 if (err) {
                     console.error('Error publishing message:', err);
                     return reject(err);

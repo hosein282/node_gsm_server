@@ -5,19 +5,22 @@ const createDevice = async (req, res) => {
     const { user_id, mac, label, model, password } = req.body; // Destructure the body
     console.log(req.body);
     let outputs, inputs = "";
-    if (model.toLowerCase() == 'g88-t') {
-        outputs = '0,0,0,0,0,0,0,0';
-        inputs = '0,0,0,0,0,0,0,0';
+    if (model.toLowerCase() == 'g84-t') {
+        outputs = '00000000';
+        inputs = '0000';
     } else if (model.toLowerCase() == 'g44-t') {
-        outputs = '0,0,0,0';
-        inputs = '0,0,0,0';
+        outputs = '0000';
+        inputs = '0000';
+    }else{
+        return res.status(400).json({ 'error': "مدل دستگاه اشتباه است" });
+
     }
     if (!user_id || !mac) {
         return res.status(400).json({ 'error': 'اطلاعات ارسالی ناقص است' });
     }
     try {
 
-        const parameters = {};
+        const parameters = {'outStates' :outputs,'inStates' : inputs, 'password': "1234"};
 
         if (user_id !== null) {
             parameters.user_id = user_id;
@@ -31,12 +34,10 @@ const createDevice = async (req, res) => {
         if (model !== null) {
             parameters.model = model;
         }
-        if (password !== null) {
-            parameters.password = password;
-        }
+
         console.log(`parameters =>${JSON.stringify(parameters)}`);
 
-        const result = await db.create('devices', parameters);
+        const result = await db.create('devices', JSON.parse(JSON.stringify(parameters)));
         if (result.affectedRows == 1 && result.serverStatus == 2) {
             return res.status(200).json({ 'success': true });
 
@@ -51,6 +52,7 @@ const createDevice = async (req, res) => {
             return res.status(400).json({ 'error': "این دستگاه قبلا ثبت شده است" });
         }
         console.log('carchhh');
+        console.log(`err =>${err}`);
         return res.status(400).json({ 'error': err });
 
     }
