@@ -55,14 +55,8 @@ function base64ToObject(base64String) {
 
 // یک روت ساده
 app.get('/', (req, res) => {
-   const  {base64} =  req.params;
-   console.log(base64);
-    const data = {
-        message: 'Welcome to my API!',
-        base64: objectToBase64('{Welcome to my API!}'),
-        text: base64ToObject(base64),
-    };
-    res.send(data);
+
+    res.send('hello world!');
 });
 
 // راه اندازی سرور
