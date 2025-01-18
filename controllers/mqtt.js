@@ -25,11 +25,21 @@ async function startMqtt() {
             var data;
 
             if (message[0] == 123) {
-                data = JSON.parse(message);
+                try {
+                    data = JSON.parse(message);
+                }
+                catch (e) {
+                    console.log(e);
+                    return;
 
+                }
             } else {
-
-                data = base64ToObject(`"${message}"`);
+                try {
+                    data = base64ToObject(`"${message}"`);
+                } catch (e) {
+                    console.log(e);
+                    return;
+                }
             }
 
             handleMqttReport(data);
@@ -77,7 +87,7 @@ function base64ToObject(base64String) {
 }
 function handleMqttReport(message) {
 
-    const { event, operator, temperature, mac, settingList, outStates, inStates, connected } = message;
+    const { event, operator, temperature, mac, settingList, outStates, inStates, connected, signal } = message;
 
     if (event === 'report') {
         let data = {};
@@ -86,6 +96,9 @@ function handleMqttReport(message) {
         }
         if (temperature != null) {
             data['temperature'] = Number(temperature);
+        }
+        if (signal != null) {
+            data['signal'] = Number(signal);
         }
         if (settingList != null) {
             data['setting'] = `'${settingList}'`;
@@ -142,7 +155,7 @@ function handleMqttReport(message) {
 
 
 function prepareData(message) {
-    const { event, operator, temperature, mac, settingList, outStates, inStates, connected } = message;
+    const { event, operator, temperature, mac, settingList, outStates, inStates, connected, signal } = message;
 
     let data = {};
     if (operator != null) {
@@ -151,6 +164,10 @@ function prepareData(message) {
 
     if (temperature != null) {
         data['temperature'] = Number(temperature);
+    }
+
+    if (signal != null) {
+        data['signal'] = Number(signal);
     }
     if (settingList != null) {
         data['setting'] = `'${settingList}'`;
