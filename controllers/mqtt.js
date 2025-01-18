@@ -61,6 +61,7 @@ async function startMqtt() {
     // setTimeout(async () => {
     //     await mqttClient.disconnect();
     // }, 10000);
+
 }
 
 // Function to convert any object to base64
@@ -98,7 +99,7 @@ function handleMqttReport(message) {
             data['temperature'] = Number(temperature);
         }
         if (signal != null) {
-            data['signal'] = Number(signal);
+            data['signalQ'] = Number(signal);
         }
         if (settingList != null) {
             data['setting'] = `'${settingList}'`;
@@ -167,7 +168,7 @@ function prepareData(message) {
     }
 
     if (signal != null) {
-        data['signal'] = Number(signal);
+        data['signalQ'] = Number(signal);
     }
     if (settingList != null) {
         data['setting'] = `'${settingList}'`;
@@ -185,7 +186,7 @@ function prepareData(message) {
 }
 function handleMqttMessage(message) {
 
-    const { mac, out, state, event, timer, label, url } = message; // Destructure the body
+    const { mac, out, state, event, timer, label, url,version } = message; // Destructure the body
     if (mac != "" && mac != undefined) {
         const topic = "action" + ">" + mac;
         const data = { 'mac': mac };
@@ -195,6 +196,7 @@ function handleMqttMessage(message) {
         if (timer !== undefined) data.timer = timer;
         if (label !== undefined) data.label = label;
         if (url !== undefined) data.url = url;
+        if (version !== undefined) data.version = version;
         console.log(data);
 
         mqttClient.publish(topic, objectToBase64(data));
