@@ -129,6 +129,11 @@ function handleMqttReport(message) {
     } else if (event === 'feedback') {
 
         let data = prepareData(message);
+        if (data['update'] === false) {
+            const topic = "sub" + ">" + mac;
+            mqttClient.publish(topic, JSON.stringify(message));
+            return;
+        }
         db.update('devices', data, { mac }).then((result) => {
             if (result) {
                 const topic = "sub" + ">" + mac;
