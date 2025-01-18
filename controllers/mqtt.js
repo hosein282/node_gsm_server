@@ -156,7 +156,7 @@ function handleMqttReport(message) {
 
 
 function prepareData(message) {
-    const { event, operator, temperature, mac, settingList, outStates, inStates, connected, signal } = message;
+    const { event, operator, temperature, mac, settingList, outStates, inStates, connected, signal, update } = message;
 
     let data = {};
     if (operator != null) {
@@ -165,6 +165,10 @@ function prepareData(message) {
 
     if (temperature != null) {
         data['temperature'] = Number(temperature);
+    }
+
+    if (update != null) {
+        data['update'] = update;
     }
 
     if (signal != null) {
@@ -186,7 +190,7 @@ function prepareData(message) {
 }
 function handleMqttMessage(message) {
 
-    const { mac, out, state, event, timer, label, url,version } = message; // Destructure the body
+    const { mac, out, state, event, timer, label, url, version, result } = message; // Destructure the body
     if (mac != "" && mac != undefined) {
         const topic = "action" + ">" + mac;
         const data = { 'mac': mac };
@@ -195,6 +199,7 @@ function handleMqttMessage(message) {
         if (event !== undefined) data.event = event;
         if (timer !== undefined) data.timer = timer;
         if (label !== undefined) data.label = label;
+        if (result !== undefined) data.result = result;
         if (url !== undefined) data.url = url;
         if (version !== undefined) data.version = version;
         console.log(data);
