@@ -1,22 +1,16 @@
 const express = require('express');
-const https = require('https');
-const fs = require('fs');
+
 const { default: mqtt } = require('mqtt');
 const userRoutes = require('./routes/userRoutes.js');
 const deviceRoutes = require('./routes/deviceRoutes.js');
 const updateRoutes = require('./routes/updateRoutes.js');
 const app = express();
-const port = 443;
+const port = 3000;
 const errorHandler = require('./errors/errorHandler');
 const db = require('./config/database.js')
 const mqttService = require('./controllers/mqtt.js')
 const auth = require('./middleware/auth.js');
 
-// SSL certificate files
-const options = {
-    key: fs.readFileSync('key.pem'),   // Replace with your key file path
-    cert: fs.readFileSync('cert.pem'), // Replace with your cert file path
-  };
 
 // 'mqtt://127.0.0.1:1883'; // Example: public MQTT broker
 
@@ -35,8 +29,6 @@ app.get('/google/',(req,res)=>{
 // مدیریت ارورها
 app.use(errorHandler);
 
-// Create HTTPS server
-const server = https.createServer(options, app);
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
@@ -64,12 +56,12 @@ function base64ToObject(base64String) {
 
 // یک روت ساده
 app.get('/', (req, res) => {
+
     res.send('hello world!');
 });
 
 // راه اندازی سرور
-// Start server
-server.listen(port, () => {
+app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });
 
