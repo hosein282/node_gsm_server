@@ -14,8 +14,8 @@ const auth = require('./middleware/auth.js');
 
 // SSL certificate files
 const options = {
-    key: fs.readFileSync('key.pem'),   // Replace with your key file path
-    cert: fs.readFileSync('cert.pem'), // Replace with your cert file path
+    key: fs.readFileSync('certs/key.pem'),   // Replace with your key file path
+    cert: fs.readFileSync('certs/cert.pem'), // Replace with your cert file path
   };
 
 // 'mqtt://127.0.0.1:1883'; // Example: public MQTT broker
