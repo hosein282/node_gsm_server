@@ -18,8 +18,10 @@
     "fs": "^0.0.1-security",
     "https": "^1.0.0",
     "jsonwebtoken": "^9.0.2",
+    "melipayamak": "^1.0.5",
     "mqtt": "^5.10.3",
     "mysql2": "^3.11.5",
-    "node-cipher": "^6.3.3"
+    "node-cipher": "^6.3.3",
+    "path": "^0.12.7"
   }
 }

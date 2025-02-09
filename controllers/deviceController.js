@@ -1,26 +1,32 @@
 
 const db = require('../repository/database');
+const getUserId = require('../middleware/decode.js');
+const deviceConfigs = require('./config/devicesConfigs.js');
 
 const createDevice = async (req, res) => {
     const { user_id, mac, label, model, password } = req.body; // Destructure the body
     console.log(req.body);
     let outputs, inputs = "";
-    if (model.toLowerCase() == 'g84-t') {
-        outputs = '00000000';
-        inputs = '0000';
-    } else if (model.toLowerCase() == 'g44-t') {
-        outputs = '0000';
-        inputs = '0000';
-    }else{
-        return res.status(400).json({ 'error': "مدل دستگاه اشتباه است" });
 
-    }
-    if (!user_id || !mac) {
-        return res.status(400).json({ 'error': 'اطلاعات ارسالی ناقص است' });
-    }
+
     try {
+         const conf = deviceConfigs.models.filter(modelConf => modelConf.name.toLowerCase() == model.toLowerCase());
+         if(conf.length ==0){
+            return res.status(400).json({ 'error': "مدل دستگاه اشتباه است" });
+         }
+         for(var i = 0 ;i<conf[0].outputs; i++){
+            outputs =+ "0";
+         }
+         for(var i = 0 ;i<conf[0].inputs; i++){
+            inputs =+ "0";
+         }
+         console.log(outputs);
 
-        const parameters = {'outStates' :outputs,'inStates' : inputs, 'password': "1234"};
+        if (!user_id || !mac) {
+            return res.status(400).json({ 'error': 'اطلاعات ارسالی ناقص است' });
+        }
+
+        const parameters = { 'outStates': outputs, 'inStates': inputs, 'password': "1234" };
 
         if (user_id !== null) {
             parameters.user_id = user_id;
@@ -48,11 +54,13 @@ const createDevice = async (req, res) => {
 
 
     } catch (err) {
+        console.log('carchhh');
+        console.log(`err =>${err}`);
+
+
         if (err.errno === 1062) {
             return res.status(400).json({ 'error': "این دستگاه قبلا ثبت شده است" });
         }
-        console.log('carchhh');
-        console.log(`err =>${err}`);
         return res.status(400).json({ 'error': err });
 
     }
@@ -75,8 +83,30 @@ const getDevices = async (req, res) => {
 
 }
 
+const deleteDevice = async (req, res) => {
+    const { mac } = req.body;
+    console.log(mac);
+    try {
+       const id = getUserId(req);
+
+        console.log(id);
+
+        const devices = await db.delete('devices', { 'mac': mac, 'user_id': id });
+        if (devices.affectedRows >0) {
+            return res.status(200).json({ success : true ,message : 'دستگاه با موفقیت حذف شد'});
+        }else{
+            return res.status(403).json({ success : false , 'error' : "محدودیت اجازه دسترسی" });
+
+        }
+    } catch (err) {
+        console.log(err);
+        return res.status(500);
+    }
+}
+
 module.exports = {
     createDevice,
-    getDevices
+    getDevices,
+    deleteDevice
 
 };
