@@ -88,10 +88,10 @@ function base64ToObject(base64String) {
 }
 function handleMqttReport(message) {
 
-    const { event, operator, temperature, mac, settingList, outStates, inStates, connected, signal } = message;
+    const { event, operator, temperature, mac, settingList, outStates, inStates, connected, signal ,timers,progs} = message;
 
     if (event === 'report') {
-        let data = {};
+        var data = {};
         if (operator != null) {
             data['operator'] = `'${operator}'`;
         }
@@ -112,6 +112,14 @@ function handleMqttReport(message) {
         }
         if (connected != null) {
             data['connected'] = connected;
+        }
+        
+        if (timers != null) {
+            data['timers'] = `'${timers}'`;
+        }
+        
+        if (progs != null) {
+            data['programs'] = `'${progs}'`;
         }
 
         db.update('devices', data, { mac }).then((result) => {
