@@ -4,11 +4,12 @@ const pool = require('../config/database');
 // مدیریت خطاهای اتصال
 pool.on('error', (err) => {
     console.error('تلاش برای برقراری مجدد:', err);
-    if (pool._closed) {
+
         console.log('Connection is closed. Reconnecting...');
         pool.end(); // بستن اتصال فعلی
         pool.connect(); // تلاش برای برقراری مجدد اتصال
-    }
+    
+        
     // در اینجا می‌توانید اقداماتی مانند تلاش برای برقراری مجدد اتصال انجام دهید
 });
 
