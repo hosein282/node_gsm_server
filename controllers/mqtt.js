@@ -64,74 +64,44 @@ async function startMqtt() {
 
 }
 
-// Function to convert any object to base64
-function objectToBase64(obj) {
-    // Convert the object to a JSON string
-    const jsonString = JSON.stringify(obj);
-
-    // Encode the JSON string to base64
-    const base64String = Buffer.from(jsonString).toString('base64');
-
-    return base64String;
-}
-
-function base64ToObject(base64String) {
-    // Decode the base64 string to JSON
-    console.log(`base64String: ${base64String}`);
-    const jsonString = Buffer.from(base64String, 'base64').toString('utf8');
-    console.log(`jsonString: ${jsonString}`);
-
-    // Parse the JSON string to an object
-    const obj = JSON.parse(jsonString);
-
-    return obj;
-}
 function handleMqttReport(message) {
 
-    const { event, operator, temperature, mac, settingList, outStates, inStates, connected, signal ,timers,progs} = message;
+    const { event, op, temp, mac, sets, outStates, inStates, conn, sig, tims, progs, status } = message;
 
     if (event === 'report') {
-        var data = {};
-        if (operator != null) {
-            data['operator'] = `'${operator}'`;
-        }
-        if (temperature != null) {
-            data['temperature'] = Number(temperature);
-        }
-        if (signal != null) {
-            data['signalQ'] = Number(signal);
-        }
-        if (settingList != null) {
-            data['setting'] = `'${settingList}'`;
-        }
-        if (outStates != null) {
-            data['outStates'] = `'${outStates}'`;
-        }
-        if (inStates != null) {
-            data['inStates'] = `'${inStates}'`;
-        }
-        if (connected != null) {
-            data['connected'] = connected;
-        }
-        
-        if (timers != null) {
-            data['timers'] = `'${timers}'`;
-        }
-        
-        if (progs != null) {
-            data['programs'] = `'${progs}'`;
-        }
+        var data = {
+            ...(op != null && { operator: op }),
+            ...(temp != null && { temperature: Number(temp.toFixed(2)) }),
+            ...(sig != null && { signalQ: Number(sig) }),
+            ...(sets != null && { setting: sets }),
+            ...(outStates != null && { outStates: outStates }),
+            ...(inStates != null && { inStates: inStates }),
+            ...(conn != null && { connected: conn }),
+            ...(status != null && { status: status }),
+            ...(tims != null && { timers: tims }),
+            ...(progs != null && { programs: progs }),
 
+        };
+        console.log(`data: ${data}`);
+
+
+        // const data = JSON.stringify(data);
         db.update('devices', data, { mac }).then((result) => {
             if (result) {
                 const topic = "sub" + ">" + mac;
-                mqttClient.publish(topic, JSON.stringify(message));
+                console.log(`qttClient.publish: ${JSON.stringify(data)}`);
+                if (event != null) {
+                    data['event'] = event;
+                }
+
+                mqttClient.publish(topic, JSON.stringify(data));
                 console.log("updated!");
 
             } else {
                 console.log("not updated!");
             }
         });
+
 
 
     } else if (event === 'feedback') {
@@ -142,6 +112,7 @@ function handleMqttReport(message) {
             mqttClient.publish(topic, JSON.stringify(message));
             return;
         }
+        
         db.update('devices', data, { mac }).then((result) => {
             if (result) {
                 const topic = "sub" + ">" + mac;
@@ -153,9 +124,33 @@ function handleMqttReport(message) {
             }
         });
 
+    } else if (event === 'state') {
+        var data = {
+            ...(status != null && { status: status }),
+            ...(conn != null ? { connected: conn } : { connected: Math.round(Date.now() / 1000) }),
+        };
+        console.log(`state data: ${data}`);
+
+        db.update('devices', data, { mac }).then((result) => {
+            if (result) {
+                const topic = "sub" + ">" + mac;
+                console.log(`qttClient.publish: ${JSON.stringify(data)}`);
+                if (event != null) {
+                    data['event'] = event;
+                }
+
+                mqttClient.publish(topic, JSON.stringify(data));
+                console.log("updated!");
+            } else {
+                console.log("not updated!");
+            }
+        });
     } else if (event === 'io') {
         handleMqttMessage(message);
     } else if (event === 'timer') {
+        handleMqttMessage(message);
+
+    }else if(event === 'program'){
         handleMqttMessage(message);
 
     } else if (event === 'status') {
@@ -169,41 +164,27 @@ function handleMqttReport(message) {
 
 
 function prepareData(message) {
-    const { event, operator, temperature, mac, settingList, outStates, inStates, connected, signal, update } = message;
+    const { event, op, temp, mac, sets, oSt, iSt, conn, sig, update ,tims,progs} = message;
 
-    let data = {};
-    if (operator != null) {
-        data['operator'] = `'${operator}'`;
-    }
+    var data = {
+        ...(op != null && { operator: op }),
+        ...(temp != null && { temperature: Number(temp.toFixed(2)) }),
+        ...(sig != null && { signalQ: Number(sig) }),
+        ...(sets != null && { setting: sets }),
+        ...(oSt != null && { outStates: oSt }),
+        ...(iSt != null && { inStates: iSt }),
+        ...(conn != null && { connected: conn }),
+        ...(tims != null && { timers: tims }),
+        ...(progs != null && { programs: progs }),
+        ...(update != null && { update: update }),
 
-    if (temperature != null) {
-        data['temperature'] = Number(temperature);
-    }
-
-    if (update != null) {
-        data['update'] = update;
-    }
-
-    if (signal != null) {
-        data['signalQ'] = Number(signal);
-    }
-    if (settingList != null) {
-        data['setting'] = `'${settingList}'`;
-    }
-    if (outStates != null) {
-        data['outStates'] = `'${outStates}'`;
-    }
-    if (inStates != null) {
-        data['inStates'] = `'${inStates}'`;
-    }
-    if (connected != null) {
-        data['connected'] = connected;
-    }
+    };
+  
     return data;
 }
 function handleMqttMessage(message) {
 
-    const { mac, out, state, event, timer, label, url, version, result } = message; // Destructure the body
+    const { mac, out, state, event, timer,program, label, url, version, result } = message; // Destructure the body
     if (mac != "" && mac != undefined) {
         const topic = "action" + ">" + mac;
         const data = { 'mac': mac };
@@ -211,6 +192,7 @@ function handleMqttMessage(message) {
         if (state !== undefined) data.state = state;
         if (event !== undefined) data.event = event;
         if (timer !== undefined) data.timer = timer;
+        if (program !== undefined) data.program = program;
         if (label !== undefined) data.label = label;
         if (result !== undefined) data.result = result;
         if (url !== undefined) data.url = url;
@@ -245,6 +227,30 @@ function getStatusFromDb(message) {
     } else {
         console.log("receiver device mac is not initialized!");
     }
+}
+
+
+// Function to convert any object to base64
+function objectToBase64(obj) {
+    // Convert the object to a JSON string
+    const jsonString = JSON.stringify(obj);
+
+    // Encode the JSON string to base64
+    const base64String = Buffer.from(jsonString).toString('base64');
+
+    return base64String;
+}
+
+function base64ToObject(base64String) {
+    // Decode the base64 string to JSON
+    console.log(`base64String: ${base64String}`);
+    const jsonString = Buffer.from(base64String, 'base64').toString('utf8');
+    console.log(`jsonString: ${jsonString}`);
+
+    // Parse the JSON string to an object
+    const obj = JSON.parse(jsonString);
+
+    return obj;
 }
 
 module.exports = {

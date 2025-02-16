@@ -6,7 +6,7 @@ const resetPassword = require('./routes/resetPassword.js');
 const deviceRoutes = require('./routes/deviceRoutes.js');
 const updateRoutes = require('./routes/updateRoutes.js');
 const app = express();
-const port = 3000;
+const port = 80;
 const errorHandler = require('./errors/errorHandler');
 const db = require('./config/database.js')
 const mqttService = require('./controllers/mqtt.js')
@@ -45,6 +45,7 @@ app.use(errorHandler);
 
 // // یک روت ساده
 app.get('/', (req, res) => {
+    console.log('Html request');
     res.sendFile(path.join(__dirname,'site' ,'index2.html'));
 });
 
@@ -55,9 +56,11 @@ console.log('HTTPS server running on port 443');
 });
 
 // راه اندازی سرور
-// app.listen(port, () => {
-//     console.log(`Server is running at http://localhost:${port}`);
-// });
+app.listen(port, () => {
+    console.log('Html request port 80');
+    console.log(`Server is running at http://localhost:${port}`);
+    
+});
 
 
 

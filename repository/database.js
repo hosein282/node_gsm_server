@@ -65,7 +65,7 @@ const db = {
 
     update: async (table, data, conditions) => {
         const setClause = Object.entries(data)
-            .map(([k, v]) => `${k} = ${v}`)
+            .map(([k, v]) => `${k} = '${v}'`)
             .join(', ');
         const whereClause = Object.entries(conditions)
             .map(([k, v]) => `${k} = '${v}'`)

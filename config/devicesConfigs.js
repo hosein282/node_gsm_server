@@ -17,7 +17,6 @@ const conf = {
             "wifi": true,
             "rf": true,
             'lastVersion': 2,
-
             "temperature": true
 
         },

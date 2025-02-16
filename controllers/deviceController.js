@@ -1,7 +1,7 @@
 
 const db = require('../repository/database');
 const getUserId = require('../middleware/decode.js');
-const deviceConfigs = require('./config/devicesConfigs.js');
+const deviceConfigs = require('../config/devicesConfigs.js');
 
 const createDevice = async (req, res) => {
     const { user_id, mac, label, model, password } = req.body; // Destructure the body
